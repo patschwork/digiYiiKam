@@ -66,3 +66,7 @@ Set a cookieValidationKey in: `/var/www/digiyiikam/config/web.php`
 Add the collection paths to your local pictures folder. This may be different than from the settings in DigiKam when they are different machines. 
 `/var/www/digiyiikam/config/params.php`
 
+# Links
+https://www.digikam.org
+https://docs.kde.org/trunk5/en/digikam-doc/digikam/using-setup.html
+https://www.yiiframework.com/doc/guide/2.0/en/start-installation
