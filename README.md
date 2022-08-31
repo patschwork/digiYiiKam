@@ -72,3 +72,12 @@ https://www.digikam.org
 https://docs.kde.org/trunk5/en/digikam-doc/digikam/using-setup.html
 
 https://www.yiiframework.com/doc/guide/2.0/en/start-installation
+
+# Some useful information
+- digiYiiKam needs it's own database to avoid changes to the digiKam database.
+- The digiKam database will only the read, with one exception by setting the "heart" tag in digiYiiKam which will make use of the tags also used by digiKam
+- digiYiiKam will produce new thumbnails and can't reuse those from digiKam (the can't be converted to be shown in the webbrowser). The new thumbnails are stored in the digiYiiKam database
+- JPEG images are shown directly from the source collection folder
+- RAW images (e.g. CR2, CR3, DNG, NEF) must be converted as JPEG and are store in the digiYiiKam database
+- digiYiiKam has command line tools for building the thumbnails and converting RAW images to JPEG
+- The orignial files will never be modified!
