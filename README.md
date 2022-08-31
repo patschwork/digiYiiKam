@@ -63,6 +63,6 @@ Enter your credentials for the digiYiiKam database: `/var/www/digiyiikam/config/
 
 Set a cookieValidationKey in: `/var/www/digiyiikam/config/web.php`
 
-Add the collection paths to your local pictures folder. This may be different that from the setting in DigiKam when this are different machines. 
+Add the collection paths to your local pictures folder. This may be different than from the settings in DigiKam when they are different machines. 
 `/var/www/digiyiikam/config/params.php`
 
