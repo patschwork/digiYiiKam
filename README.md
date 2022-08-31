@@ -2,8 +2,10 @@
 Web frontend for the famous open-source software DigiKam Photo Management
 
 # Requirements
-OS: Linux or MAC with PHP
-Database: MySQL or MariaDB
+| Component    | Software    |
+| --- | --- |
+| OS  | Linux or MAC with PHP support |
+| Database | MySQL or MariaDB |
 
 digiYiiKam uses the Yii2-Framework and was tested with DigiKam running with MySQL. 
 
