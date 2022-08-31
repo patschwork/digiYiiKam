@@ -17,8 +17,10 @@ Be sure, that the Apache or web server user (e.g. www-data on Debian, Ubuntu, ..
 
 ## Additional components for PHP
 
+```
 sudo apt install composer
 sudo apt install php-apcu
+```
 
 ## Application
 Go to the folder, where digiYiiKam shall be installed. E.g. `cd /var/www/`
@@ -47,7 +49,7 @@ git clone https://github.com/patschwork/digiYiiKam.git
 ```
 
 # Configuration
-Enter your credentials for the DigiKam database: /var/www/digiyiikam/config/db_digikam.php
+Enter your credentials for the DigiKam database: `/var/www/digiyiikam/config/db_digikam.php`
 
 Create a new (MySQL) database named digiyiikam aside the digikam database
 
@@ -55,10 +57,10 @@ Create a new (MySQL) database named digiyiikam aside the digikam database
 CREATE DATABASE `digiYiiKam` /*!40100 DEFAULT CHARACTER SET latin1 */
 ```
 
-Enter your credentials for the digiYiiKam database: /var/www/digiyiikam/config/db.php
+Enter your credentials for the digiYiiKam database: `/var/www/digiyiikam/config/db.php`
 
-Set a cookieValidationKey in: /var/www/digiyiikam/config/web.php
+Set a cookieValidationKey in: `/var/www/digiyiikam/config/web.php`
 
 Add the collection paths to your local pictures folder. This may be different that from the setting in DigiKam when this are different machines. 
-/var/www/digiyiikam/config/params.php
+`/var/www/digiyiikam/config/params.php`
 
