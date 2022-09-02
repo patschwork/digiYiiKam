@@ -12,6 +12,7 @@ Web frontend for the famous open-source software DigiKam Photo Management
 | --- | --- |
 | OS  | Linux or MAC with PHP support |
 | Database | MySQL or MariaDB |
+| Image converting | exiftool, exiv2, dcraw, convert (from ImageMagick) |
 
 digiYiiKam uses the Yii2-Framework and was tested with DigiKam running with MySQL. 
 
@@ -28,6 +29,11 @@ Be sure, that the Apache or web server user (e.g. www-data on Debian, Ubuntu, ..
 ```
 sudo apt update
 sudo apt install php php-pdo php-intl php-xml php-zip php-mbstring php-mysql php-sqlite3 unzip composer php-apcu
+```
+# Image converting
+On Ubuntu 22.04 (or derivates) exiftool and dcraw should already be fine (and in the right version). You only need to install exiv2 (needed for CR2 file format).
+```
+sudo apt-get install exiv2
 ```
 
 ## Application
