@@ -1,6 +1,9 @@
 # digiYiiKam
 Web frontend for the famous open-source software DigiKam Photo Management
 
+# Screenshots
+![Startpage](/etc/screenshots/screenshot_01.jpg?raw=true "Startpage with pie chart")
+
 # Requirements
 | Component    | Software    |
 | --- | --- |
