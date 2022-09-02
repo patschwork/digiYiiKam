@@ -85,7 +85,9 @@ Note: Tags and other metadata are always realtime taken from digiKam.
 php yii utils/add-thumbnails-database
 php yii utils/generate-thumbnails
 ```
-
+# Small start
+If you only want to quick test, you can also start the application without set up a Apache or Nginx web server. PHP/Yii2 provides a integrated development server.
+Go to the digiyiikam folder and run `php yii serve 0.0.0.0 --port=8888`
 
 # Links
 https://www.digikam.org
