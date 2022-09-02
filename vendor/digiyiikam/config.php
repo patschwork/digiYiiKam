@@ -17,8 +17,10 @@ class Config
     {
         $returnValue = array();
         array_push($returnValue, 'DUMMY'); // ID = 0
+        if (str_contains(gethostname(), "Air-von-Patrick")) array_push($returnValue, '/Volumes/Macintosh HD/Volumes/Macintosh HD/System/Volumes/Data/media/remote/smb_srv_bilder/'); // ID = 1
+        if (str_contains(gethostname(), "patsch3")) array_push($returnValue, '/media/remote/smb_srv_bilder/'); // ID = 1
         if (str_contains(gethostname(), "srv")) array_push($returnValue, '/var/www/digiYiiKam/bilder/'); // ID = 1
-        if (!is_null(Yii::$app->params['collectionPaths'])) $returnValue = Yii::$app->params['collectionPaths'];
+        if (isset(Yii::$app->params['collectionPaths'])) if (is_array(Yii::$app->params['collectionPaths'])) $returnValue = Yii::$app->params['collectionPaths'];
         return $returnValue;
     }    
     
