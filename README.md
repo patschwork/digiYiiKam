@@ -17,15 +17,17 @@ Be sure, that the Apache or web server user (e.g. www-data on Debian, Ubuntu, ..
 
 # Installation
 
-## Additional components for PHP
+## PHP components
 
 ```
-sudo apt install composer
-sudo apt install php-apcu
+sudo apt update
+sudo apt install php php-pdo php-intl php-xml php-zip php-mbstring php-mysql php-sqlite3 unzip composer php-apcu
 ```
 
 ## Application
 Go to the folder, where digiYiiKam shall be installed. E.g. `cd /var/www/`
+
+We will now install the Yii2 components and needed extensions with composer.
 
 ```
 composer create-project --prefer-dist yiisoft/yii2-app-basic digiyiikam
@@ -65,6 +67,27 @@ Set a cookieValidationKey in: `/var/www/digiyiikam/config/web.php`
 
 Add the collection paths to your local pictures folder. This may be different than from the settings in DigiKam when they are different machines. 
 `/var/www/digiyiikam/config/params.php`
+
+# Get started
+## Prepare thumbnails table
+Go to the digiyiikam folder
+`php yii utils/init-thumbnails-database`
+
+## Build thumbnails and raw-previews
+Go to the digiyiikam folder
+`php yii utils/generate-thumbnails`
+
+# New or updated data in digiKam
+When you add photos to your collections digiYiiKam needs to know about this. 
+You can also create regular schedules (e.g. with a cron job) to automate this. 
+Note: Tags and other metadata are always realtime taken from digiKam. 
+
+## Refresh
+```
+php yii utils/add-thumbnails-database
+php yii utils/generate-thumbnails
+```
+
 
 # Links
 https://www.digikam.org
