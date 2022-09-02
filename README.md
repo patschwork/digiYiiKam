@@ -70,12 +70,10 @@ Add the collection paths to your local pictures folder. This may be different th
 
 # Get started
 ## Prepare thumbnails table
-Go to the digiyiikam folder
-`php yii utils/init-thumbnails-database`
+Go to the digiyiikam folder and run `php yii utils/init-thumbnails-database`
 
 ## Build thumbnails and raw-previews
-Go to the digiyiikam folder
-`php yii utils/generate-thumbnails`
+Go to the digiyiikam folder and run `php yii utils/generate-thumbnails`
 
 # New or updated data in digiKam
 When you add photos to your collections digiYiiKam needs to know about this. 
