@@ -109,6 +109,7 @@ https://www.yiiframework.com/doc/guide/2.0/en/start-installation
 - [x] Show CR2 (Canon) images as thumbnails and in gallery
 - [x] Show DNG (Smartphone, Drone) images as thumbnails and in gallery
 - [x] Show NEF (Nikon) images as thumbnails and in gallery
+- [ ] Show more RAW format images (Sony, Fuji, ...) as thumbnails and in gallery
 - [ ] Show MP4 videos as thumbnails and in gallery
 - [x] Tag a favorite image in digiYiiKam using the tag-management from digiKam.
 - [x] Show metadata for each image
@@ -116,6 +117,7 @@ https://www.yiiframework.com/doc/guide/2.0/en/start-installation
 - [x] Build up RAW preview-images (as JPEG) in database with the command line
 - [x] Show navigation for folder and tags
 - [x] Jump to/show all images using the same tag as currently displaying (link to tags)
+- [x] Show info pie chart on start page with some statistics 
 - [ ] Set/unset other tags used in digiKam
 - [ ] Show geo location info
 - [ ] Browse images upon time frame
