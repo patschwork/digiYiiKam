@@ -3,6 +3,9 @@ Web frontend for the famous open-source software DigiKam Photo Management
 
 # Screenshots
 ![Startpage](/etc/screenshots/screenshot_01.jpg?raw=true "Startpage with pie chart")
+![Navigation](/etc/screenshots/screenshot_02.jpg?raw=true "Navigation with filesystem or tags")
+![Gallery](/etc/screenshots/screenshot_03.jpg?raw=true "Gallery with showing metadata")
+![Gallery](/etc/screenshots/screenshot_04.jpg?raw=true "Gallery with tagged image")
 
 # Requirements
 | Component    | Software    |
