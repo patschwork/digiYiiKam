@@ -53,6 +53,20 @@ git clone https://github.com/patschwork/digiYiiKam.git
 ```
 
 # Configuration
+
+## Rename sample files
+The config files needs to be renamed for the first time (avoiding overwriting on updates of the application).
+
+Rename the following files:
+| Sample file | Config file | Decription |
+| --- | --- | --- |
+| /config/db\_digikam\_SAMPLE.php | /config/db_digikam.php | Database connection to the **digiKam** database |
+| /config/db_SAMPLE.php | /config/db.php | Database connection to the **digiYiiKam** database |
+| /config/params_SAMPLE.php | /config/params.php | Application parameter. <br><br>Add the collection paths here (where are the images stored) |
+| /config/web_SAMPLE.php | /config/web.php | Yii2 application config. Should only be edited once for the cookieValidation key. |
+
+## Databases
+
 Enter your credentials for the DigiKam database: `/var/www/digiyiikam/config/db_digikam.php`
 
 Create a new (MySQL) database named digiyiikam aside the digikam database
@@ -63,7 +77,11 @@ CREATE DATABASE `digiYiiKam` /*!40100 DEFAULT CHARACTER SET latin1 */
 
 Enter your credentials for the digiYiiKam database: `/var/www/digiyiikam/config/db.php`
 
+## CookieValidationKey
+
 Set a cookieValidationKey in: `/var/www/digiyiikam/config/web.php`
+
+## Collections / paths
 
 Add the collection paths to your local pictures folder. This may be different than from the settings in DigiKam when they are different machines. 
 `/var/www/digiyiikam/config/params.php`
