@@ -102,3 +102,20 @@ https://www.yiiframework.com/doc/guide/2.0/en/start-installation
 - RAW images (e.g. CR2, CR3, DNG, NEF) must be converted as JPEG and are store in the digiYiiKam database
 - digiYiiKam has command line tools for building the thumbnails and converting RAW images to JPEG
 - The orignial files will never be modified!
+
+# Roadmap
+- [x] Show JPEG images as thumbnails
+- [x] Show CR3 (Canon) images as thumbnails and in gallery
+- [x] Show CR2 (Canon) images as thumbnails and in gallery
+- [x] Show DNG (Smartphone, Drone) images as thumbnails and in gallery
+- [x] Show NEF (Nikon) images as thumbnails and in gallery
+- [ ] Show MP4 videos as thumbnails and in gallery
+- [x] Tag a favorite image in digiYiiKam using the tag-management from digiKam.
+- [x] Show metadata for each image
+- [x] Build up thumbnails in database with the command line
+- [x] Build up RAW preview-images (as JPEG) in database with the command line
+- [x] Show navigation for folder and tags
+- [x] Jump to/show all images using the same tag as currently displaying (link to tags)
+- [ ] Set/unset other tags used in digiKam
+- [ ] Show geo location info
+- [ ] Browse images upon time frame
