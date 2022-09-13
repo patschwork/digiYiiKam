@@ -153,3 +153,5 @@ https://www.yiiframework.com/doc/guide/2.0/en/start-installation
 - [ ] Set/unset other tags used in digiKam
 - [ ] Show geo location info
 - [ ] Browse images upon time frame
+- [x] Button to download JPEG preview file
+- [x] Button to download RAW source file
