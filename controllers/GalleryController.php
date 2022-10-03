@@ -241,12 +241,34 @@ class GalleryController extends Controller
     }
     // ...}
 
+    public function btn_download_jpg($digikam_Images_id)
+    {
+        $text = '<i style="color:  #008fff;" class="fas fa-file-download"></i>';
+        $url = Url::to(['gallery/downloadjpg', 'digikam_Images_id' => $digikam_Images_id]);
+        $options = ['class' => 'btn btn-dark'];
+        $btn = Html::a($text, $url, $options);
+
+        return $btn;
+    }
+
+    public function btn_download_src($digikam_Images_id)
+    {
+        $text = '<i style="color:  #ffc900;" class="fas fa-file-download"></i>';
+        $url = Url::to(['gallery/downloadsrc', 'digikam_Images_id' => $digikam_Images_id]);
+        $options = ['class' => 'btn btn-dark'];
+        $btn = Html::a($text, $url, $options);
+
+        return $btn;
+    }
+
     /**
      * List by albums
      */
     public function actionAlbum($albumid = -1)
     {
         $utils = new \vendor\digiyiikam\utils();
+        
+        $utils->updateLastLocation($albumid, NULL);
 
         // if there are changes, reset the cache
         if ($utils->has_diff_compare_digikam_table_stats())
@@ -314,6 +336,8 @@ class GalleryController extends Controller
                         "heart-tag" => $this->heart_tag_buttonV2($rowThumbnails->digikam_Images_id, "heart", $heart_tags_arr),
                         "digikam_Images_id" => $rowThumbnails->digikam_Images_id
                         // ...}
+                        ,"download-jpg" => $this->btn_download_jpg($rowThumbnails->digikam_Images_id)
+                        ,"download-src" => $this->btn_download_src($rowThumbnails->digikam_Images_id)
                         )
             ];
             array_push($items, $element);
@@ -335,6 +359,8 @@ class GalleryController extends Controller
     public function actionTag($tagid = -1)
     {
         $utils = new \vendor\digiyiikam\utils();
+
+        $utils->updateLastLocation(NULL, $tagid);
 
         // if there are changes, reset the cache
         if ($utils->has_diff_compare_digikam_table_stats())
@@ -479,6 +505,39 @@ class GalleryController extends Controller
         return $response->send();
     }
 
+    public function actionDownloadjpg($digikam_Images_id)
+    {
+        $qryI = DykImages::findOne(['digikam_Images_id' => $digikam_Images_id]);
+        
+        $useImage = false;
+        if (!is_null($qryI))
+        {
+            if ($qryI->not_needed_source_is_a_jpeg == 0)
+            {
+                $useImage = true;
+            }
+        }
+
+        if ($useImage)
+        {
+            if ($qryI->not_needed_source_is_a_jpeg == 0)
+            {
+                return Yii::$app->response->sendContentAsFile($qryI->image_blob, $qryI->image_filename);
+            }
+        }
+        else
+        {
+            $fullpath_source = (new \vendor\digiyiikam\utils())->get_translated_fullpath_for_source_image($digikam_Images_id);
+            return Yii::$app->response->sendFile($fullpath_source, basename($fullpath_source));
+        }
+    }
+
+    public function actionDownloadsrc($digikam_Images_id)
+    {
+        $fullpath_source = (new \vendor\digiyiikam\utils())->get_translated_fullpath_for_source_image($digikam_Images_id);
+        return Yii::$app->response->sendFile($fullpath_source, basename($fullpath_source));
+    }
+
     // {... heart-tag
     public function actionSetdyktagforimage()
     {
@@ -566,4 +625,114 @@ class GalleryController extends Controller
         }
     }
     // ...}
+
+
+
+
+
+    /**
+     * List by albums
+     */
+    public function actionImagesonlytest($albumid = -1)
+    {
+        $utils = new \vendor\digiyiikam\utils();
+        
+        $utils->updateLastLocation($albumid, NULL);
+
+        // if there are changes, reset the cache
+        if ($utils->has_diff_compare_digikam_table_stats())
+        {
+            $utils->flushCache();
+            $utils->eraseNavCache();
+        }
+
+        $config = new \vendor\digiyiikam\config();
+        
+        $albums_with_id = $this->get_albums_with_id_as_array($utils);
+        $collectionPaths = $config->getCollectionPaths();
+
+        // {... heart-tag
+        $tagModel_parent = \app\models\Tags::find()->where(['name' => 'DigiYiiKam'])->andWhere(['pid' => 0])->one();
+        if (is_null($tagModel_parent)) $tagparentid = -1; else $tagparentid = $tagModel_parent->id;
+        $tagModel_child = \app\models\Tags::find()->where(['name' => 'heart'])->andWhere(['pid' => $tagparentid])->one();
+        if (is_null($tagModel_child)) $heart_tagid = -1; else $heart_tagid = $tagModel_child->id;
+        $heart_tags=\app\models\ImageTags::find()->select(['imageid'])->where(['tagid' => $heart_tagid])->asArray()->all();
+        $heart_tags_arr = $utils->flatten($heart_tags);
+        // ...}
+
+        $images = array();
+        $images_AlbumRoot = array();
+        $images_RelativePath = array();
+        $images_filename = array();
+        $album_name = "";
+
+        foreach($utils->get_Images_From_Albums($albumid) as $rowImages)
+        {
+            array_push($images, $rowImages->id);
+            $images_filename[$rowImages->id]     = $rowImages->name;
+            $images_AlbumRoot[$rowImages->id]    = $rowImages->albums[0]->albumRoot;
+            $images_RelativePath[$rowImages->id] = $rowImages->albums[0]->relativePath;
+            $album_name                          = $rowImages->albums[0]->relativePath;
+        }
+
+        $DykThumbnails_Model = DykThumbnails::find()->select(['id', 'thumbnail_filename', 'parent_image_full_filepath', 'digikam_Images_id'])->where(['IN','digikam_Images_id', $images])->all();
+
+        $items = array();
+        foreach($DykThumbnails_Model as $rowThumbnails)
+        {
+            // same logic as utils.get_translated_fullpath_for_source_image($imageid), but this will not call the database again, and again... 
+            // maybe utils.get_translated_fullpath_for_source_image should be optimized to use existing model instances...
+            $fullpath_source = 
+                $collectionPaths[$images_AlbumRoot[$rowThumbnails->digikam_Images_id]]
+              . substr($images_RelativePath[$rowThumbnails->digikam_Images_id],1,99999)
+              . '/'
+              . $images_filename[$rowThumbnails->digikam_Images_id]
+              ;
+
+            $info = pathinfo($fullpath_source);
+            $file_name =  basename($fullpath_source,'.'.$info['extension']);
+
+            $exif = $this->get_digikam_metadata_as_html($rowThumbnails->digikam_Images_id, $images_RelativePath[$rowThumbnails->digikam_Images_id]);
+            
+            $element = [
+                    'src' => Url::to(['thumbnail/getimage', 'id' => $rowThumbnails->id]),
+                    'url' => Url::to(['gallery/getfullimagefromdatabase', 'digikam_Images_id' => $rowThumbnails->digikam_Images_id]),
+                    'options' => array(
+                        'title' => $file_name. '.'.$info['extension'] . "  |  " . $images_RelativePath[$rowThumbnails->digikam_Images_id] , 
+                        "exif" =>  $exif, 
+                        // {... heart-tag
+                        // "heart-tag" => $this->heart_tag_button($rowThumbnails->digikam_Images_id),
+                        "heart-tag" => $this->heart_tag_buttonV2($rowThumbnails->digikam_Images_id, "heart", $heart_tags_arr),
+                        "digikam_Images_id" => $rowThumbnails->digikam_Images_id
+                        // ...}
+                        ,"download-jpg" => $this->btn_download_jpg($rowThumbnails->digikam_Images_id)
+                        ,"download-src" => $this->btn_download_src($rowThumbnails->digikam_Images_id)
+                        )
+            ];
+            array_push($items, $element);
+        }
+
+        $param = [
+            'albumid' => $albumid
+           ,'album_name' => $album_name
+           ,'items' => $items
+           ,'albums_with_id' => $albums_with_id
+        ];
+        return $this->render('album5_images', $param);
+    }
+
+    public function actionNavtest()
+    {
+        $param = [
+            'albumid' => 1234
+           ,'album_name' => "album_name"
+           ,'items' => []
+           ,'albums_with_id' => 4321
+        ];
+        return $this->render('album5_nav', $param);
+
+    }
+
+
+
 }

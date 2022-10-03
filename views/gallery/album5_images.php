@@ -2,50 +2,17 @@
 
 /** @var yii\web\View $this */
 
-use app\models\DykNavigationCache;
-use kartik\sidenav\SideNav;
+// NUR DIE BILDER DER GALLERY
 
-
-$this->title = 'Album: ' . $album_name;
-$this->params['fluid'] = true;
 ?>
-<br>
-<br>
-<br>
 
-<?php
-// $expl=explode("/", $album_name);
-// unset($expl[0]);
-// VarDumper::dump($expl, 10, true);
-?>
 
 <style>
-.container-fluid {
-   height: auto;
-   overflow: hidden;
-}
-
-.right {
-    width: 70%;
-    float: right;
-    padding-left: 10px;
-}
-
-.left {
-    float: none; /* not needed, just for clarification */
-    /* the next props are meant to keep this block independent from the other floated one */
-    width: auto;
-    overflow: hidden;
-    background: #aafed6;
-
-}
-
 .blueimp-gallery > .description_btn {
   position: absolute;
   top: 70px;
   left: 50px;
 }
-
 
 .blueimp-gallery > .description, .blueimp-gallery > .example {
   position: absolute;
@@ -238,8 +205,6 @@ localStorage.removeItem("heart-tag-states");
   ?>
 </div>
 <div class="container-fluid">
-  <div class="right">
-
     <?= 
             dosamigos\gallery\Gallery::widget(
                 [
@@ -300,60 +265,6 @@ localStorage.removeItem("heart-tag-states");
                 ]
             ); 
         ?>
-    </div>
-    <div class="left">
-    <?php
-    $utils = new \vendor\digiyiikam\Utils();
-    // Yii::debug(strlen(json_encode($items1)), 'Dev album4');
-    // $m = new DykNavigationCache();
-    // $m->name = 'filesystem';
-    // $m->nav = json_encode($items1);
-    // $m->save();
-    
-    
-    $l_m = DykNavigationCache::findOne(['name' => 'filesystem']);
-    if (!is_null($l_m))
-    {
-      $nav_data = $l_m->nav;
-      $items1 = unserialize($nav_data);
-    }
-    else
-    {
-      $items1 = $utils->prepare_navsidebar_data();
-      $m = new DykNavigationCache();
-      $m->name = 'filesystem';
-      $m->nav = serialize($items1);
-      $m->save();
-    }
-
-    $items2 = array();
-    $l_m_2 = DykNavigationCache::findOne(['name' => 'tags']);
-    if (!is_null($l_m_2))
-    {
-      $nav_data = $l_m_2->nav;
-      $items2 = unserialize($nav_data);
-    }
-    else
-    {
-      array_push($items2, ['label' => "Tags", 'icon' => "tags", 'items' => (new \vendor\digiyiikam\utils())->TagItemsTree()]);
-      $m = new DykNavigationCache();
-      $m->name = 'tags';
-      $m->nav = serialize($items2);
-      $m->save();
-    }
-
-    $items = array_merge($items1, $items2);
-
-    echo SideNav::widget([
-      'type' => SideNav::TYPE_INFO,
-      'encodeLabels' => false,
-      'heading' => '<i class="fas fa-map-signs"></i> Navigation',
-      'iconPrefix' => 'fa fa-',
-      'indItem' => "",
-      'items' => $items,
-    ]);        
-        ?>
-    </div>
 </div>
 
 

@@ -140,6 +140,8 @@ class Gallery extends Widget
         // {... heart-tag
         $template[] = '<a class="heart-tag"></a>';  // PATRICK
         // ...}
+        $template[] = '<a class="download-src"></a>';  // PATRICK
+        $template[] = '<a class="download-jpg"></a>';  // PATRICK
         $template[] = '<a class="play-pause"></a>';
         $template[] = '<ol class="indicator"></ol>';
         

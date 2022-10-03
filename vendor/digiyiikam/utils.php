@@ -5,6 +5,7 @@ use Yii;
 use app\models\Albums;
 use app\models\DykDigikamTableStats;
 use app\models\DykImages;
+use app\models\DykLastPosition;
 use app\models\Images;
 use app\models\DykLog;
 use app\models\DykNavigationCache;
@@ -478,7 +479,8 @@ class Utils
      * Get a list of all images (with tags) from DigiKam, which already have a thumbnail in the DigiYiiKam database
      * @return \yii\db\ActiveRecord
      * 
-     * Test with Yii Shell: (new \vendor\digiyiikam\utils())->get_Images_From_Tags(); 
+     * Test in yii shell:
+     * (new \vendor\digiyiikam\utils())->get_Images_From_Tags(); 
      */
     public function get_Images_From_Tags($TagId = NULL)
     {
@@ -492,6 +494,7 @@ class Utils
             ->where(
                 ['IN','Images.id', $this->flatten($DykThumbnails_Model)]
             )
+            ->andWhere(['not', ['album' => NULL]])
         ;
         if (!is_null($TagId))
         {
@@ -502,6 +505,48 @@ class Utils
     }
 
     /**
+     * Prints needed and evaluated versions of the converting tools.
+     * Test in yii shell:
+     * (new \vendor\digiyiikam\utils())->print_needed_convert_tools_and_versions(); 
+     */
+    public function print_needed_convert_tools_and_versions()
+    {
+        echo "Print needed conversion tools:\n\n";
+        $fileextensions = array("CR3", "CR2", "DNG", "NEF", "MP4");
+        foreach($fileextensions as $key=>$fileextension)
+        {
+            echo "Fileextension: $fileextension\n";
+            $res = $this->get_cmd_for_image_converting($fileextension, "/tmp/sourcefile.$fileextension", "/tmp/workingdir");
+            if ($res["used_tool"] == null)
+            {
+                print_r("Not supported!"."\n");
+            }
+            else
+            {
+                print_r("Needed tools: ".$res["used_tool"]."\n");
+                print_r("Needed versions: ".$res["minimum_version_tool"]."\n");
+                print_r("Command to evaluate versions: ".$res["cmd_get_version_tool"]."\n");
+                
+                if ($res["cmd_get_version_tool"] !== null)
+                {
+                    $get_version_commands_arr = explode(";", $res["cmd_get_version_tool"]);
+                    foreach($get_version_commands_arr as $key=>$command)
+                    {
+                        $out = "";
+                        $rescode = "";
+                        exec($command, $out, $rescode);
+                        print_r("Version command output:\n");
+                        print_r("\t->\t".$out[0]);
+                        print_r("\n");
+                        if ($rescode <> 0) print_r("Returncode: ".$rescode."\n");
+                    }
+                }
+            }
+            echo "----------------------------------------\n\n";
+        }
+    }
+
+    /**
      * This function checks based on the fileextension of a RAW file which commandline tool will be executed for
      * converting the source file to a JPG image. The execution is not done.
      * @param string fileextension Extension of the file (currently supported are CR3, CR2, NEF, DNG).
@@ -509,11 +554,14 @@ class Utils
      * @param string workingDir Where is the RAW file on the local filesystem? (e.g. /tmp/digiyiikam/dykworkingdir_62fffa9bda604). It will not be checked if existing.
      * @return array arr["cmd"]                         = [string] String ready to be executed on the OS (Linux/MAC).
      *               arr["converted_image_fullpath"]    = [string] This will be the expected converted image file as result.
-     *               arr["used_tool"]                   = [string] The used commandline tool (to convert the image).
-     *               arr["minimum_version_tool"]        = [string] Minimum version needed of the used commandline tool.
-     *               arr["cmd_get_version_tool"]        = [string] How to get the version info from the commandline tool.
+     *               arr["used_tool"]                   = [string] The used commandline tool (to convert the image). If multiple tools are used, they are separated with a semicolon.
+     *               arr["minimum_version_tool"]        = [string] Minimum version needed of the used commandline tool. If multiple tools are used, they are separated with a semicolon.
+     *               arr["cmd_get_version_tool"]        = [string] How to get the version info from the commandline tool. If multiple tools are used, they are separated with a semicolon.
      *               arr["not_needed_output"][n]        = [array of string] Dump files not needed anymore (maybe part of the converting).
      *               arr["fileextension_not_supported"] = [bool] Flag indicating, if fileextension (RAW image type) is supported.
+     * Test in yii shell:
+     * $utils = new \vendor\digiyiikam\utils();
+     * $utils->get_cmd_for_image_converting("CR3", "/tmp/sourcefile.CR3", "/tmp/workingdir");
      */
     public function get_cmd_for_image_converting($fileextension, $src_filename, $workingDir)
     {
@@ -565,7 +613,7 @@ class Utils
             $returnValues["cmd"] = "dcraw -T -o 0 -w $src_filename;convert $tiff_file $expected_file";
             $returnValues["used_tool"] = "dcraw;convert"; // dcraw and ImageMagick convert
             $returnValues["minimum_version_tool"] = "9.28;6.9.11-60";
-            $returnValues["cmd_get_version_tool"] = "dcraw | grep -i 'Raw photo decoder \"dcraw\" v';convert -version";
+            $returnValues["cmd_get_version_tool"] = "dcraw | grep -i 'Raw photo decoder \"dcraw\" v';convert -version | grep -i 'Version: ImageMagick '";
             $returnValues["converted_image_fullpath"] = "$workingDir/$expected_file";
             $returnValues["not_needed_output"][0] = "$workingDir/$tiff_file";
             $returnValues["fileextension_not_supported"] = false;
@@ -573,6 +621,18 @@ class Utils
         return $returnValues;
     }
 
+    /**
+     * This function will produce a JPG (in a local temporary folder) of different RAW source files.
+     * The function goes step by step (create folder, remove temp. files during the process).
+     * It will not cleanup the produced files afterwards!
+     * @param integer $ImageId ID from digiKam image row. The correct path will be evaluated.
+     * @return array arr["error"]                       = [boolean] True of false if a error happened.
+     *               arr["error_msg"]                   = [array] Error messages line by line (stacktrace or additional information).
+     *               arr["generated_jpg_file"]          = [string] Produced full_filepath to JPG file.
+     *               arr["parent_image_full_filepath"]  = [string] Full_filepath absolute to the source file.
+     *               arr["parent_image_file_extension"] = [string] File extension of the source file.
+     *               arr["parent_image_mime"]           = [string] MIME type of the source file.
+     */
     public function convert_raw_to_jpg($ImageId)
     {
         $returnValues = array();
@@ -757,7 +817,7 @@ class Utils
         return $returnValues;        
     }
 
-    public function prepare_navsidebar_data()
+    public function prepare_navsidebar_data($useAnchorLinks = false)
     {
         $s = "/";
         $label_for_this_folder = 'This folder <i class="fas fa-images"></i>';
@@ -830,6 +890,9 @@ class Utils
                                                                                 ,$icon_for_this_folder
                                                                                 ,$tmp9 // call by ref
                                                                                 ,$tmp10 // call by ref
+                                                                                ,'folder'
+                                                                                ,'images'                                                
+                                                                                ,$useAnchorLinks
                                                                             );
                                                                         }
                                                                     }
@@ -843,6 +906,9 @@ class Utils
                                                                         ,$icon_for_this_folder
                                                                         ,$tmp8 // call by ref
                                                                         ,$tmp9 // call by ref
+                                                                        ,'folder'
+                                                                        ,'images'                                        
+                                                                        ,$useAnchorLinks
                                                                     );
                                                                 }
                                                             }
@@ -856,6 +922,9 @@ class Utils
                                                                 ,$icon_for_this_folder
                                                                 ,$tmp7 // call by ref
                                                                 ,$tmp8 // call by ref
+                                                                ,'folder'
+                                                                ,'images'                                
+                                                                ,$useAnchorLinks
                                                             );
                                                         }
                                                     }
@@ -869,6 +938,9 @@ class Utils
                                                         ,$icon_for_this_folder
                                                         ,$tmp6 // call by ref
                                                         ,$tmp7 // call by ref
+                                                        ,'folder'
+                                                        ,'images'                        
+                                                        ,$useAnchorLinks
                                                     );
         
                                                 }
@@ -883,6 +955,9 @@ class Utils
                                                 ,$icon_for_this_folder
                                                 ,$tmp5 // call by ref
                                                 ,$tmp6 // call by ref
+                                                ,'folder'
+                                                ,'images'                
+                                                ,$useAnchorLinks
                                             );
                                         }
                                     }
@@ -896,6 +971,9 @@ class Utils
                                         ,$icon_for_this_folder
                                         ,$tmp4 // call by ref
                                         ,$tmp5 // call by ref
+                                        ,'folder'
+                                        ,'images'        
+                                        ,$useAnchorLinks
                                     );
                                 }
                             }
@@ -909,6 +987,9 @@ class Utils
                                 ,$icon_for_this_folder
                                 ,$tmp3 // call by ref
                                 ,$tmp4 // call by ref
+                                ,'folder'
+                                ,'images'
+                                ,$useAnchorLinks
                             );
                         }
                     }
@@ -926,6 +1007,8 @@ class Utils
                         ,$tmp2 // call by ref
                         ,$tmp3 // call by ref
                         ,$icon_folder // overriding default
+                        ,'images'
+                        ,$useAnchorLinks
                     );
                 }
                 $tmp1 = ['label' => "Filesystem".$key1, 'icon' => 'folder', 'items' => $tmp2];
@@ -949,7 +1032,7 @@ class Utils
      * @param string $icon_folder            Default: 'folder'. Icon for a folder element.
      * @param string $icon_images            Default: 'images'. Icon for a images element.
      */
-    private function evaluate_tree_element($label_key, $value, $chk_path, $albums_with_path, $label_for_this_folder, $icon_for_this_folder, &$tmpParent, &$tmpChild, $icon_folder = 'folder', $icon_images = 'images')
+    private function evaluate_tree_element($label_key, $value, $chk_path, $albums_with_path, $label_for_this_folder, $icon_for_this_folder, &$tmpParent, &$tmpChild, $icon_folder = 'folder', $icon_images = 'images', $useAnchorLinks = false)
     {
         $label = strlen($label_key)>53 ? substr($label_key,0,50)."..." : $label_key;
         if (is_array($value))
@@ -957,7 +1040,9 @@ class Utils
             if (array_key_exists($chk_path, $albums_with_path)) array_push($tmpChild, ['label' => $label_for_this_folder, 'icon' => $icon_for_this_folder, 'url' => ['gallery/album', 'albumid' => $albums_with_path[$chk_path]]]);
             array_push($tmpParent, ['label' => $label, 'icon' => $icon_folder, 'items' => $tmpChild]);
         }
-        else array_push($tmpParent, ['label' => $label, 'icon' => $icon_images, 'url' => ['gallery/album', 'albumid' => $value]]);
+        else 
+        if (!$useAnchorLinks) array_push($tmpParent, ['label' => $label, 'icon' => $icon_images, 'url' => ['gallery/album', 'albumid' => $value]]);
+        else array_push($tmpParent, ['label' => $label, 'icon' => $icon_images, 'url' => "#$value"]);
     }
 
     // $utils = new \vendor\digiyiikam\utils();
@@ -1140,6 +1225,12 @@ class Utils
         }
     }
 
+    /**
+     * Compares the value counts from the digiYiiKam table dyk_digikam_table_stats with the 
+     * current table count of the digiKam tables.
+     * This method is needed to determine, if a cache reset is necessary.
+     * @return bool If one table count differs, then true is returned. Otherwise false (table counts in sync)
+     */
     public function has_diff_compare_digikam_table_stats()
     {
         $returnValue = false;
@@ -1154,7 +1245,10 @@ class Utils
         return $returnValue;
     }
 
-
+    /**
+     * Reset application cache (used for caching database query results).
+     * @return string Message text with the result.
+     */
     public function flushCache($id='cache')
     {
         if (!isset(Yii::$app->{$id}) || !(Yii::$app->{$id} instanceof Cache)) {
@@ -1171,8 +1265,52 @@ class Utils
         return $msg;
     }
 
+    /**
+     * Erase all items in the digiYiiKam database table dyk_navigation_cache.
+     * @return int Deleted items
+     */
     public function eraseNavCache()
     {
         return DykNavigationCache::deleteAll();
+    }
+
+    /**
+     * Erase all entries (should be only one) of the table and then save new values.
+     * @return bool Returnvalue of model saving
+     */
+    public function updateLastLocation($albumid = NULL, $tagid = NULL)
+    {
+        DykLastPosition::deleteAll();
+        $model = new DykLastPosition();
+        $model->albumid = $albumid;
+        $model->tagid = $tagid;
+        return $model->save();
+    }
+
+    /**
+     * Get the last position where the user has been (in the navigation tree).
+     * If nothing is found, the fallback is the first found albumid with images.
+     * @return array Nav::widget item array element.
+     */
+    public function getLastLocation()
+    {
+        $qry = DykLastPosition::find()->one();
+        if (!is_null($qry))
+        {
+            if (!is_null($qry->albumid))
+            {
+                return ['/gallery/album', 'albumid' => $qry->albumid];
+            }
+            else
+            {
+                if (!is_null($qry->tagid))
+                {
+                    return ['/gallery/tag', 'tagid' => $qry->tagid];
+                }                
+            }
+        }
+
+        // Fallback
+        return ['/gallery/album', 'albumid' => (new \vendor\digiyiikam\utils())->get_Albums_With_Images()[0]->id];
     }
 }

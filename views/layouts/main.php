@@ -38,8 +38,7 @@ AppAsset::register($this);
         'options' => ['class' => 'navbar-nav'],
         'items' => [
             ['label' => 'Folder', 'url' => ['/gallery/index']],
-            // ['label' => 'Gallery', 'url' => ['/gallery/album', 'albumid' => (new \vendor\digiyiikam\utils())->get_Albums_With_Images()[0]->id]],
-            ['label' => 'Gallery', 'url' => ['/gallery/album', 'albumid' => 927]],
+            ['label' => 'Gallery', 'url' => (new \vendor\digiyiikam\Utils())->getLastLocation()],
             ['label' => 'Running proc.', 'url' => ['/check/runningprocesses']],
             ['label' => 'Flush cache', 'url' => ['check/flushcache']],
             // ['label' => 'Home', 'url' => ['/site/index']],

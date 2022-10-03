@@ -2,7 +2,6 @@
 
 /** @var yii\web\View $this */
 
-use app\models\DykNavigationCache;
 use kartik\sidenav\SideNav;
 
 
@@ -13,11 +12,6 @@ $this->params['fluid'] = true;
 <br>
 <br>
 
-<?php
-// $expl=explode("/", $album_name);
-// unset($expl[0]);
-// VarDumper::dump($expl, 10, true);
-?>
 
 <style>
 .container-fluid {
@@ -217,6 +211,7 @@ function toggleEXIFBox() {
 localStorage.removeItem("heart-tag-states");
 // ...}
 
+
 </script>
 
 <div class="loading-indicator" style="z-index: 1; position: absolute; left: 50%; top: 20%;">
@@ -240,109 +235,20 @@ localStorage.removeItem("heart-tag-states");
 <div class="container-fluid">
   <div class="right">
 
-    <?= 
-            dosamigos\gallery\Gallery::widget(
-                [
-                    'items' => $items,
-                    'clientEvents' => [
-                        'onslide' => 'function(index, slide) {
-                            console.log(index);
-                            var text = this.list[index].getAttribute("exif");
-                            node = this.container.find(".description");
-                            node.empty();
-                            if (text) {
-                              node[0].innerHTML = text;
-                            }
-                            
-                            node_download_jpg = this.container.find(".download-jpg");
-                            var download_jpg = this.list[index].getAttribute("download-jpg");
-                            node_download_jpg.empty();
-                            if (download_jpg) {
-                              node_download_jpg[0].innerHTML = download_jpg;
-                            }
-                            
-                            node_download_src = this.container.find(".download-src");
-                            var download_src = this.list[index].getAttribute("download-src");
-                            node_download_src.empty();
-                            if (download_src) {
-                              node_download_src[0].innerHTML = download_src;
-                            }                            
-                            
-                            // {... heart-tag
-                            node_ht = this.container.find(".heart-tag");
-                            var heart_tag = this.list[index].getAttribute("heart-tag");
-                            var digikam_Images_id = this.list[index].getAttribute("digikam_Images_id");
-                            if (heart_tag)
-                            {
-                                if (JSON.parse(localStorage.getItem("heart-tag-states")))
-                                {
-                                    arr = JSON.parse(localStorage.getItem("heart-tag-states"));
-                                    if (arr[digikam_Images_id])
-                                    {
-                                      // restore saved state from user interaction
-                                      node_ht[0].innerHTML = arr[digikam_Images_id];
-                                    }
-                                    else
-                                    {
-                                      // state from server side/database
-                                      node_ht[0].innerHTML = heart_tag;
-                                    }  
-                                }
-                                else
-                                {
-                                  // state from server side/database
-                                  node_ht[0].innerHTML = heart_tag;
-                                }
-                          }
-                          // ...}
-                        }'
-                ]
-                ]
-            ); 
-        ?>
+  <iframe id="iframe_1" width="100%" height="800px" src="index.php?r=gallery%2Fimagesonlytest&albumid=1005"></iframe>
+    
     </div>
     <div class="left">
     <?php
+    $items = [
+      ['label' => '1005', 'url' => '#1005',  'active' =>  false],
+      ['label' => '1006', 'url' => '#1006',  'active' =>  false],
+      ['label' => '1009', 'url' => '#1009',  'active' =>  false],
+      ['label' => '1010', 'url' => '#1010',  'active' =>  false],
+    ];
+
     $utils = new \vendor\digiyiikam\Utils();
-    // Yii::debug(strlen(json_encode($items1)), 'Dev album4');
-    // $m = new DykNavigationCache();
-    // $m->name = 'filesystem';
-    // $m->nav = json_encode($items1);
-    // $m->save();
-    
-    
-    $l_m = DykNavigationCache::findOne(['name' => 'filesystem']);
-    if (!is_null($l_m))
-    {
-      $nav_data = $l_m->nav;
-      $items1 = unserialize($nav_data);
-    }
-    else
-    {
-      $items1 = $utils->prepare_navsidebar_data();
-      $m = new DykNavigationCache();
-      $m->name = 'filesystem';
-      $m->nav = serialize($items1);
-      $m->save();
-    }
-
-    $items2 = array();
-    $l_m_2 = DykNavigationCache::findOne(['name' => 'tags']);
-    if (!is_null($l_m_2))
-    {
-      $nav_data = $l_m_2->nav;
-      $items2 = unserialize($nav_data);
-    }
-    else
-    {
-      array_push($items2, ['label' => "Tags", 'icon' => "tags", 'items' => (new \vendor\digiyiikam\utils())->TagItemsTree()]);
-      $m = new DykNavigationCache();
-      $m->name = 'tags';
-      $m->nav = serialize($items2);
-      $m->save();
-    }
-
-    $items = array_merge($items1, $items2);
+    $items1 = $utils->prepare_navsidebar_data($useAnchorLinks = true);
 
     echo SideNav::widget([
       'type' => SideNav::TYPE_INFO,
@@ -350,7 +256,7 @@ localStorage.removeItem("heart-tag-states");
       'heading' => '<i class="fas fa-map-signs"></i> Navigation',
       'iconPrefix' => 'fa fa-',
       'indItem' => "",
-      'items' => $items,
+      'items' => $items1,
     ]);        
         ?>
     </div>
@@ -363,4 +269,21 @@ $script='$(document).ready(function() {
   $(".loading-indicator").css("display","none");
 });'; 
 $this->registerJs($script, \yii\web\View::POS_LOAD);
+?>
+
+<?php
+$script2='// ANKER LINKS ABFANGEN
+$(document).ready(function() {
+                $(document).click(function (event) {
+                    // alert(event);
+                    console.log(event);
+                    href=event.target.hash;
+                    albumid = href.replace("#", "");
+                    targetURL = "index.php?r=gallery%2Fimagesonlytest&albumid=" + albumid;
+                    console.log(targetURL);
+                    document.getElementById("iframe_1").src = targetURL;
+                    // alert(targetURL);
+                });
+            });'; 
+$this->registerJs($script2, \yii\web\View::POS_READY);
 ?>
