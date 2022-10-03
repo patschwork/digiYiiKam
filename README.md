@@ -28,7 +28,7 @@ Be sure, that the Apache or web server user (e.g. www-data on Debian, Ubuntu, ..
 
 ```
 sudo apt update
-sudo apt install php php-pdo php-intl php-xml php-zip php-mbstring php-mysql php-sqlite3 unzip composer php-apcu
+sudo apt install php php-pdo php-intl php-xml php-zip php-mbstring php-mysql php-sqlite3 unzip composer php-apcu mcrypt
 ```
 # Image converting
 On Ubuntu 22.04 (or derivates) exiftool and dcraw should already be fine (and in the right version). You only need to install exiv2 (needed for CR2 file format).
