@@ -14,13 +14,13 @@ Web frontend for the famous open-source software DigiKam Photo Management
 | Database | MySQL or MariaDB |
 | Image converting | exiftool, exiv2, dcraw, convert (from ImageMagick) |
 
-digiYiiKam uses the Yii2-Framework and was tested with DigiKam running with MySQL. 
+digiYiiKam uses the Yii2-Framework and was tested with DigiKam running on MySQL as database backend. 
 
 ## SQLite support 
 SQLite should also work, but is not tested. digiYiiKam must have access to the database file from DigiKam.
 
 ## Read access to photo collection(s)
-Be sure, that the Apache or web server user (e.g. www-data on Debian, Ubuntu, ...) has read-access to the image files.
+Be sure, that the Apache or web server user (e.g. www-data on Debian, Ubuntu, ...) has read-access to the image files/folders.
 
 # Installation
 
@@ -31,7 +31,7 @@ sudo apt update
 sudo apt install php mcrypt php-pdo php-intl php-xml php-zip php-mbstring php-mysql php-sqlite3 php-gd unzip composer php-apcu git
 ```
 # Image converting
-On Ubuntu 22.04 (or derivates) exiftool and dcraw should already be fine (and in the right version). You only need to install exiv2 (needed for CR2 file format).
+On Ubuntu 22.04 (or derivates) exiftool and dcraw should already be fine (and in the right version). You only need to install exiv2 (needed for converting the CR2 file format).
 ```
 sudo apt-get install exiv2 dcraw imagemagick exiftool
 ```
@@ -81,10 +81,24 @@ Rename the following files:
 
 Enter your credentials for the DigiKam database: `/var/www/digiyiikam/config/db_digikam.php`
 
-Create a new (MySQL) database named digiyiikam aside the digikam database
+Create a new (MySQL) database named digiYiiKam aside the digikam database
 
 ```sql
 CREATE DATABASE `digiYiiKam` /*!40100 DEFAULT CHARACTER SET latin1 */
+```
+
+You should consider to create a dedicated MySQL user with restricted rights
+```sql
+CREATE user 'digiyiikam'@'%' identified BY '***RANDOM__PASSWORD__HERE***';
+
+GRANT USAGE ON digikam.* TO 'digiyiikam'@'%';
+GRANT SELECT ON digikam.* TO 'digiyiikam'@'%';
+GRANT INSERT,DELETE,UPDATE ON digikam.Tags TO 'digiyiikam'@'%';
+GRANT INSERT,DELETE,UPDATE ON digikam.ImageTags TO 'digiyiikam'@'%';
+
+GRANT USAGE ON digiYiiKam.* TO 'digiyiikam'@'%';
+GRANT SELECT,INSERT,DELETE,UPDATE ON digiYiiKam.* TO 'digiyiikam'@'%';
+FLUSH PRIVILEGES;
 ```
 
 Enter your credentials for the digiYiiKam database: `/var/www/digiyiikam/config/db.php`
@@ -95,7 +109,7 @@ Set a cookieValidationKey in: `/var/www/digiyiikam/config/web.php`
 
 ## Collections / paths
 
-Add the collection paths to your local pictures folder. This may be different than from the settings in DigiKam when they are different machines. 
+Add the collection paths to your local pictures folder. This may be different than from the settings in DigiKam when they are installed on different machines. 
 `/var/www/digiyiikam/config/params.php`
 
 # Get started
@@ -106,7 +120,7 @@ Go to the digiyiikam folder and run `php yii utils/init-thumbnails-database`
 Go to the digiyiikam folder and run `php yii utils/generate-thumbnails`
 
 # New or updated data in digiKam
-When you add photos to your collections digiYiiKam needs to know about this. 
+When you add photos to your collections, digiYiiKam needs to know about this. 
 You can also create regular schedules (e.g. with a cron job) to automate this. 
 Note: Tags and other metadata are always realtime taken from digiKam. 
 
@@ -116,7 +130,7 @@ php yii utils/add-thumbnails-database
 php yii utils/generate-thumbnails
 ```
 # Small start
-If you only want to quick test, you can also start the application without set up a Apache or Nginx web server. PHP/Yii2 provides a integrated development server.
+If you only want to quick test, you can also start the application without set up a Apache or Nginx web server. PHP/Yii2 provides an integrated development server.
 Go to the digiyiikam folder and run `php yii serve 0.0.0.0 --port=8888`
 
 # Links
@@ -128,11 +142,11 @@ https://www.yiiframework.com/doc/guide/2.0/en/start-installation
 
 # Some useful information
 - digiYiiKam needs it's own database to avoid changes to the digiKam database.
-- The digiKam database will only the read, with one exception by setting the "heart" tag in digiYiiKam which will make use of the tags also used by digiKam
+- The digiKam database will only be read, with one exception by setting the "heart" tag in digiYiiKam which will make use of the tags also used by digiKam
 - digiYiiKam will produce new thumbnails and can't reuse those from digiKam (digiKam thumbnails are incompatible to be shown in the webbrowser). The new thumbnails are stored in the digiYiiKam database
 - JPEG images are shown directly from the source collection folder
-- RAW images (e.g. CR2, CR3, DNG, NEF) must be converted as JPEG and are store in the digiYiiKam database
-- digiYiiKam has command line tools for building the thumbnails and converting RAW images to JPEG
+- RAW images (e.g. CR2, CR3, DNG, NEF) must be converted as JPEG and are stored in the digiYiiKam database
+- digiYiiKam has commandline tools for building the thumbnails and converting RAW images to JPEG
 - The orignial files will never be modified!
 
 # Roadmap
