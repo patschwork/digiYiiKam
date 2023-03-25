@@ -28,7 +28,7 @@ Be sure, that the Apache or web server user (e.g. www-data on Debian, Ubuntu, ..
 
 ```
 sudo apt update
-sudo apt install php mcrypt php-pdo php-intl php-xml php-zip php-mbstring php-mysql php-sqlite3 unzip composer php-apcu git
+sudo apt install php mcrypt php-pdo php-intl php-xml php-zip php-mbstring php-mysql php-sqlite3 php-gd unzip composer php-apcu git
 ```
 # Image converting
 On Ubuntu 22.04 (or derivates) exiftool and dcraw should already be fine (and in the right version). You only need to install exiv2 (needed for CR2 file format).
@@ -155,3 +155,4 @@ https://www.yiiframework.com/doc/guide/2.0/en/start-installation
 - [ ] Browse images upon time frame
 - [x] Button to download JPEG preview file
 - [x] Button to download RAW source file
+- [x] Use Redis cache
