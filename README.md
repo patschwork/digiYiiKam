@@ -133,6 +133,9 @@ php yii utils/generate-thumbnails
 If you only want to quick test, you can also start the application without set up a Apache or Nginx web server. PHP/Yii2 provides an integrated development server.
 Go to the digiyiikam folder and run `php yii serve 0.0.0.0 --port=8888`
 
+# etc
+Refreshing the digiYiiKam database was tested successfully using Concourse CI (https://github.com/concourse/concourse). Create an issue if you want to know how it could be working...
+
 # Links
 https://www.digikam.org
 
@@ -150,6 +153,8 @@ https://www.yiiframework.com/doc/guide/2.0/en/start-installation
 - The orignial files will never be modified!
 
 # Roadmap
+- [x] Browse by file path (albums) or tags
+- [x] Show counts of images per tag
 - [x] Show JPEG images as thumbnails
 - [x] Show CR3 (Canon) images as thumbnails and in gallery
 - [x] Show CR2 (Canon) images as thumbnails and in gallery
@@ -170,3 +175,6 @@ https://www.yiiframework.com/doc/guide/2.0/en/start-installation
 - [x] Button to download JPEG preview file
 - [x] Button to download RAW source file
 - [x] Use Redis cache
+- [x] Browse by file path (albums) or tags
+- [x] Continue browsing (last path) photos from the last visit
+- [ ] Build a docker image
