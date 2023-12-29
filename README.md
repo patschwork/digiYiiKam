@@ -16,6 +16,33 @@ Web frontend for the famous open-source software DigiKam Photo Management
 
 digiYiiKam uses the Yii2-Framework and was tested with DigiKam running on MySQL as database backend. 
 
+# Architecture overview
+
+```mermaid
+flowchart TD
+    central_location_images(<b>fa:fa-image Central location for all images</b>):::highlight
+    digikam_thumbnails[(digikam\n<small>Thumbnails</small>\n<i>MySQL</i>)]
+    digikam_similarity[(digikam\n<small>Similarity</small>\n<i>MySQL</i>)]
+    digikam_face[(digikam\n<small>Face recognition</small>\n<i>MySQL</i>)]
+    digikam_main[(digikam\n<i>MySQL</i>)]:::highlight
+    digiyiikam[(<b>digiyiikam\nMySQL</b>)]:::highlight
+    digikam_main -->|image IDs\nare copied| digiyiikam
+    digikam_app[fa:fa-camera-retro digiKam Application]
+    digiyiikam_app[fa:fa-camera-retro fa:fa-globe digiYiiKam Web-App]:::highlight
+    desktop_client[fa:fa-desktop PC / Mac]
+    desktop_client --> digikam_app
+    desktop_client --> digiyiikam_app
+    central_location_images <--> digiyiikam_app & desktop_client
+    digikam_app <--> digikam_main
+    digikam_app <--> digikam_face
+    digikam_app <--> digikam_similarity
+    digikam_app <--> digikam_thumbnails
+    digiyiikam_app <--> digiyiikam
+    digiyiikam_app <--> |fa:fa-exclamation-triangle Writeback only for tags| digikam_main
+
+    classDef highlight stroke:#f00
+```
+
 ## SQLite support 
 SQLite should also work, but is not tested. digiYiiKam must have access to the database file from DigiKam.
 
