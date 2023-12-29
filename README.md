@@ -25,7 +25,7 @@ flowchart TD
     digikam_similarity[(digikam\n<small>Similarity</small>\n<i>MySQL</i>)]
     digikam_face[(digikam\n<small>Face recognition</small>\n<i>MySQL</i>)]
     digikam_main[(digikam\n<i>MySQL</i>)]:::highlight
-    digiyiikam[(<b>digiyiikam\nMySQL</b>)]:::highlight
+    digiyiikam[(<b>digiyiikam\n<i>MySQL</i></b>)]:::highlight
     digikam_main -->|image IDs\nare copied| digiyiikam
     digikam_app[fa:fa-camera-retro digiKam Application]
     digiyiikam_app[fa:fa-camera-retro fa:fa-globe digiYiiKam Web-App]:::highlight
