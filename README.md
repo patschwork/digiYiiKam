@@ -204,4 +204,4 @@ https://www.yiiframework.com/doc/guide/2.0/en/start-installation
 - [x] Use Redis cache
 - [x] Browse by file path (albums) or tags
 - [x] Continue browsing (last path) photos from the last visit
-- [ ] Build a docker image
+- [x] Build a docker image
