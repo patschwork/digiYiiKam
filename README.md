@@ -205,3 +205,11 @@ https://www.yiiframework.com/doc/guide/2.0/en/start-installation
 - [x] Browse by file path (albums) or tags
 - [x] Continue browsing (last path) photos from the last visit
 - [x] Build a docker image
+- [x] LDAP Login (login only, no rights management)
+
+# Tested camaras RAW images formats
+- Canon CR2 ✅
+- Canon CR3 ✅ (also with newer types which is created by R7 oder R5mk2)
+- Sony ARW ✅
+- DNG ✅ (DJI, Google, OnePlus)
+- Nikon NEF ✅
