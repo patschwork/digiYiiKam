@@ -209,7 +209,7 @@ https://www.yiiframework.com/doc/guide/2.0/en/start-installation
 
 # Tested camaras RAW images formats
 - Canon CR2 ✅
-- Canon CR3 ✅ (also with newer types which is created by R7 oder R5mk2)
+- Canon CR3 ✅ (also with newer types which are created by R7 or R5mk2)
 - Sony ARW ✅
 - DNG ✅ (DJI, Google, OnePlus)
 - Nikon NEF ✅
